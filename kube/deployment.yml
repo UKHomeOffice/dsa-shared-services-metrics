@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dsa-shs-monitoring
+  labels:
+    app: dsa-shs-monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dsa-shs-monitoring
+  template:
+    metadata:
+      labels:
+        app: dsa-shs-monitoring
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/dsa-monitor/prometheus"
+    spec:
+      #hostAliases:
+      #  ip: 127.0.0.1
+      containers:
+      - name: dsa-shs-monitoring
+        image: "quay.io/ukhomeofficedigital/dsa-shared-services-metrics:latest"
+        imagePullPolicy: Always
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+        tty: true
+        stdin: true
+        ports:
+          - containerPort: 8000
+          - containerPort: 8080
